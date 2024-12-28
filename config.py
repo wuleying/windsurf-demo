@@ -24,7 +24,7 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """测试环境配置"""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:root@localhost/windsurf_demo_test?charset=utf8mb4'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:@localhost/windsurf_demo_test?charset=utf8mb4'
 
 class ProductionConfig(Config):
     """生产环境配置"""
