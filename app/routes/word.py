@@ -7,7 +7,7 @@ word_bp = Blueprint('word', __name__)
 @word_bp.route('/')
 def index():
     """首页"""
-    error_prone_words = WordService.get_error_prone_words(10)
+    error_prone_words = WordService.get_error_prone_words(100)
     return render_template('index.html', error_prone_words=error_prone_words)
 
 @word_bp.route('/words')
