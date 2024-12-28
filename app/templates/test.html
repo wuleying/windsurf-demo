@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">单词测试</h5>
+            </div>
+            <div class="card-body">
+                {% if word %}
+                    <div id="testContainer" data-word-id="{{ word.id }}">
+                        <h3 class="text-center mb-3">{{ word.word }}</h3>
+                        <p class="text-center text-muted mb-4">词性：{{ word.part_of_speech }}</p>
+                        
+                        <div class="translations">
+                            {% for translation in translations %}
+                                <div class="d-grid gap-2 mb-2">
+                                    <button class="btn btn-outline-primary translation-btn" 
+                                            data-translation="{{ translation }}">
+                                        {{ translation }}
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div id="result" class="mt-4 text-center" style="display: none;">
+                            <div class="alert" role="alert"></div>
+                            <button id="nextBtn" class="btn btn-primary">下一个</button>
+                        </div>
+                    </div>
+                {% else %}
+                    <p class="text-center">暂无可测试的单词</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const testContainer = document.getElementById('testContainer');
+    if (!testContainer) return;
+
+    const wordId = testContainer.dataset.wordId;
+    const correctTranslation = '{{ word.correct_translation }}';
+    const resultDiv = document.getElementById('result');
+    const resultAlert = resultDiv.querySelector('.alert');
+    const nextBtn = document.getElementById('nextBtn');
+
+    document.querySelectorAll('.translation-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const selectedTranslation = this.dataset.translation;
+            const isCorrect = selectedTranslation === correctTranslation;
+
+            // 禁用所有按钮
+            document.querySelectorAll('.translation-btn').forEach(b => {
+                b.disabled = true;
+                if (b.dataset.translation === correctTranslation) {
+                    b.classList.remove('btn-outline-primary');
+                    b.classList.add('btn-success');
+                } else if (b.dataset.translation === selectedTranslation && !isCorrect) {
+                    b.classList.remove('btn-outline-primary');
+                    b.classList.add('btn-danger');
+                }
+            });
+
+            // 显示结果
+            resultAlert.classList.add(isCorrect ? 'alert-success' : 'alert-danger');
+            resultAlert.textContent = isCorrect ? '回答正确！' : '回答错误！';
+            resultDiv.style.display = 'block';
+
+            // 如果答错了，增加错误计数
+            if (!isCorrect) {
+                fetch(`/api/words/${wordId}/increment-error`, {
+                    method: 'POST'
+                });
+            }
+        });
+    });
+
+    nextBtn.addEventListener('click', function() {
+        window.location.reload();
+    });
+});
+</script>
+{% endblock %}

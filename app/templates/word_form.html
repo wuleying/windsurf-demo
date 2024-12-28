@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">{{ '编辑' if word else '添加' }}单词</h5>
+            </div>
+            <div class="card-body">
+                <form id="wordForm" method="POST">
+                    <div class="mb-3">
+                        <label for="word" class="form-label">英文单词</label>
+                        <input type="text" class="form-control" id="word" name="word" 
+                               value="{{ word.word if word else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="part_of_speech" class="form-label">词性</label>
+                        <select class="form-select" id="part_of_speech" name="part_of_speech" required>
+                            <option value="">请选择词性</option>
+                            <option value="n." {{ 'selected' if word and word.part_of_speech == 'n.' else '' }}>名词 (n.)</option>
+                            <option value="v." {{ 'selected' if word and word.part_of_speech == 'v.' else '' }}>动词 (v.)</option>
+                            <option value="adj." {{ 'selected' if word and word.part_of_speech == 'adj.' else '' }}>形容词 (adj.)</option>
+                            <option value="adv." {{ 'selected' if word and word.part_of_speech == 'adv.' else '' }}>副词 (adv.)</option>
+                            <option value="prep." {{ 'selected' if word and word.part_of_speech == 'prep.' else '' }}>介词 (prep.)</option>
+                            <option value="conj." {{ 'selected' if word and word.part_of_speech == 'conj.' else '' }}>连词 (conj.)</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="correct_translation" class="form-label">正确翻译</label>
+                        <input type="text" class="form-control" id="correct_translation" name="correct_translation"
+                               value="{{ word.correct_translation if word else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="wrong_translation_1" class="form-label">错误翻译1</label>
+                        <input type="text" class="form-control" id="wrong_translation_1" name="wrong_translation_1"
+                               value="{{ word.wrong_translation_1 if word else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="wrong_translation_2" class="form-label">错误翻译2</label>
+                        <input type="text" class="form-control" id="wrong_translation_2" name="wrong_translation_2"
+                               value="{{ word.wrong_translation_2 if word else '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="wrong_translation_3" class="form-label">错误翻译3</label>
+                        <input type="text" class="form-control" id="wrong_translation_3" name="wrong_translation_3"
+                               value="{{ word.wrong_translation_3 if word else '' }}" required>
+                    </div>
+                    <div class="text-end">
+                        <a href="{{ url_for('word.word_list') }}" class="btn btn-secondary">取消</a>
+                        <button type="submit" class="btn btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('wordForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = {
+        word: document.getElementById('word').value,
+        part_of_speech: document.getElementById('part_of_speech').value,
+        correct_translation: document.getElementById('correct_translation').value,
+        wrong_translation_1: document.getElementById('wrong_translation_1').value,
+        wrong_translation_2: document.getElementById('wrong_translation_2').value,
+        wrong_translation_3: document.getElementById('wrong_translation_3').value
+    };
+
+    const wordId = '{{ word.id if word else "" }}';
+    const method = wordId ? 'PUT' : 'POST';
+    const url = wordId ? `/api/words/${wordId}` : '/api/words/';
+
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.href = '{{ url_for("word.word_list") }}';
+        } else {
+            throw new Error('保存失败');
+        }
+    })
+    .catch(error => {
+        alert(error.message);
+    });
+});
+</script>
+{% endblock %}

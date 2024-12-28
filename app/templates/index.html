@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">易错单词 Top 10</h5>
+            </div>
+            <div class="card-body">
+                {% if error_prone_words %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>单词</th>
+                                    <th>词性</th>
+                                    <th>中文翻译</th>
+                                    <th>错误次数</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for word in error_prone_words %}
+                                    <tr>
+                                        <td>{{ word.word }}</td>
+                                        <td>{{ word.part_of_speech }}</td>
+                                        <td>{{ word.correct_translation }}</td>
+                                        <td>
+                                            <span class="badge bg-danger">{{ word.error_count }}</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-center">暂无易错单词数据</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

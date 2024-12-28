@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">单词列表</h5>
+                <a href="{{ url_for('word.add_word') }}" class="btn btn-primary btn-sm">添加单词</a>
+            </div>
+            <div class="card-body">
+                {% if words %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>单词</th>
+                                    <th>词性</th>
+                                    <th>中文翻译</th>
+                                    <th>错误次数</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for word in words %}
+                                    <tr>
+                                        <td>{{ word.word }}</td>
+                                        <td>{{ word.part_of_speech }}</td>
+                                        <td>{{ word.correct_translation }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if word.error_count > 0 %}danger{% else %}success{% endif %}">
+                                                {{ word.error_count }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{{ url_for('word.edit_word', word_id=word.id) }}" 
+                                               class="btn btn-sm btn-outline-primary">编辑</a>
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-outline-danger delete-word" 
+                                                    data-word-id="{{ word.id }}">删除</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-center">暂无单词数据</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.querySelectorAll('.delete-word').forEach(button => {
+    button.addEventListener('click', function() {
+        if (confirm('确定要删除这个单词吗？')) {
+            const wordId = this.dataset.wordId;
+            fetch(`/api/words/${wordId}`, {
+                method: 'DELETE',
+            }).then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('删除失败，请稍后重试');
+                }
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
