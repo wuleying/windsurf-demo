@@ -33,23 +33,10 @@ def edit_word(word_id):
 @word_bp.route('/test')
 def test():
     """单词测试页面"""
-    # 获取所有单词
-    words = WordService.get_all_words()
-    if not words:
+    # 使用权重算法获取测试单词
+    word, translations = WordService.get_weighted_random_word()
+    if not word:
         return render_template('test.html')
-    
-    # 随机选择一个单词
-    word = random.choice(words)
-    
-    # 准备翻译选项（1个正确答案和3个错误答案）
-    translations = [
-        word.correct_translation,
-        word.wrong_translation_1,
-        word.wrong_translation_2,
-        word.wrong_translation_3
-    ]
-    # 随机打乱顺序
-    random.shuffle(translations)
     
     return render_template('test.html', word=word, translations=translations)
 
