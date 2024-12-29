@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from app import db
 
 class Word(db.Model):
@@ -13,8 +13,8 @@ class Word(db.Model):
     wrong_translation_2 = db.Column(db.String(200), nullable=False, comment='错误翻译2')
     wrong_translation_3 = db.Column(db.String(200), nullable=False, comment='错误翻译3')
     error_count = db.Column(db.Integer, default=0, comment='错误次数')
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, comment='创建时间')
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, comment='更新时间')
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), comment='创建时间')
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc), comment='更新时间')
 
     def to_dict(self):
         """
